@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+  binaryTargets   = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum StudyLevel {
+  FIRST
+  SECOND
+  THIRD
+}
+
+enum Specialization {
+  LICENSE
+  MASTER
+  DOCTORAT
+  ENGINEER
+  PREPARATORY
+  OTHER
+}
+
+enum Tech {
+  AI
+  WEB
+  DEVOPS
+  MOBILE
+  PROBLEM_SOLVING
+  UI_UX
+  OTHER
+}
+
+model Fac {
+  id   String @id @default(uuid())
+  name String @unique
+
+  attendees Attendee[]
+}
+
+model Team {
+  id   String @id @default(uuid())
+  name String @unique
+
+  members    Attendee[]         @relation(name: "AttendeeToTeam")
+  challenges ChallengesByTeam[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Attendee {
+  id String @id @default(uuid())
+
+  name  String
+  email String @unique
+  phone String @unique
+
+  studyLevel     StudyLevel?
+  specialization Specialization?
+
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], name: "AttendeeToTeam")
+
+  ticketId String @unique
+  ticket   Ticket @relation(fields: [ticketId], references: [ticketNo], name: "AttendeeToTicket")
+
+  facId String?
+  fac   Fac?    @relation(fields: [facId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ticket {
+  ticketNo String  @id
+  done     Boolean @default(false)
+  hadMeal  Boolean @default(false)  
+  hadLunch  Boolean @default(false)
+  
+  attendee   Attendee?           @relation("AttendeeToTicket")
+  workshops  WorkshopsByTicket[] @relation()
+  workshopId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkshopsByTicket {
+  hasAttended Boolean @default(false)
+
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [ticketNo], onDelete: Cascade)
+
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([ticketId, workshopId])
+}
+
+model Workshop {
+  id   String @id @default(uuid())
+  name String
+
+  tickets WorkshopsByTicket[] @relation()
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ChallengesByTeam {
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  challengeId Int
+  challenge   Challenge @relation(fields: [challengeId], references: [id], name: "TeamChallenges")
+
+  score       Int    @default(0)
+  description String
+
+  @@id([teamId, challengeId])
+}
+
+model Challenge {
+  id               Int                @id @default(autoincrement())
+  name             String
+  number           Int                @unique
+  points           Int
+  description      String              @db.MediumText
+  key              String?            
+  hint             String?
+  tech             Tech?
+  challengesByTeam ChallengesByTeam[] @relation("TeamChallenges")
+
+  domaineId Int?
+  domaine   Domaine? @relation(fields: [domaineId], references: [id])
+}
+
+model Domaine {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  challenges Challenge[] @relation()
+}
+
+model Controle {
+   id Int     @id  @db.TinyInt @default(autoincrement())
+  isFrozen  Boolean    @default(false)
+}
