@@ -9,7 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChallengesService } from './challenges.service';
 import CreateChallengeDto from './dto/create-challenge.dto';
 import { SubmitChallengeDto } from './dto/submit-challenge.dto';
@@ -49,6 +49,7 @@ export class ChallengesController {
   }
 
   @Patch('toggle-freeze')
+  @ApiOperation({ summary: 'Activer/Désactiver le système' })
   systemToggleFreeze(@Body() toggleFreezeDto: ToggleFreezeDto) {
     return this.challengesService.systemToggleFreeze(toggleFreezeDto);
   }

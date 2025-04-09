@@ -10,7 +10,11 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-      return decoded.code === process.env.MIC_CODE;
+      if (typeof decoded === 'object' && 'code' in decoded) {
+        return decoded.code === process.env.MIC_CODE;
+      } else {
+        return false;
+      }
     } catch (error) {
       return false;
     }

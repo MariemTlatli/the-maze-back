@@ -4,9 +4,10 @@ services:
     image: mysql:latest
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: M1e2h3d4i5
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: the_maze_db
-      MYSQL_PASSWORD: M1e2h3d4i5
+      MYSQL_PASSWORD: root
     volumes:
       - ./data:/var/lib/mysql
     ports:

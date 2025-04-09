@@ -4,10 +4,11 @@ const prisma = new PrismaClient();
 
 async function seedWorkshops() {
   const workshopsData = [
-    { name: 'AI : The power of Language NLP' },
-    { name: '.NET : The Day Ai writes your next App (Beginner friendly )' },
-    { name: 'BI : Mastering Data Insights Power Bi' },
+    { name: 'AI' },
+    { name: 'API communication' },
+    { name: 'SAP' },
     { name: 'UI/UX Design' },
+    { name: 'DevOps' },
   ];
 
   return prisma.workshop.createMany({
@@ -33,10 +34,10 @@ async function seedFacs() {
 }
 async function seedDomaines() {
   const domainesData = [
-    { name: 'BI' },
-    { name: 'Agriculture' },
-    { name: 'Health tech' },
-    { name: 'industrie 4.0' },
+    { name: 'Digital Learning' },
+    { name: 'Smart Business' },
+    { name: 'Health Tech' },
+    { name: 'Travel Quest' },
   ];
   return prisma.domaine.createMany({
     data: [...domainesData],
@@ -50,7 +51,7 @@ async function seedChallenges() {
       description: 'description 1',
       points: 60,
       number: 1,
-      tech: Tech.AI,
+      tech: Tech.WEB,
     },
     {
       name: 'Challenge 2',
@@ -58,7 +59,7 @@ async function seedChallenges() {
       description: 'description 2',
       points: 40,
       number: 2,
-      tech: Tech.MOBILE,
+      tech: Tech.DEVOPS,
     },
     {
       name: 'Challenge 3',

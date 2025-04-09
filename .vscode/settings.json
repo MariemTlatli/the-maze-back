@@ -1,3 +1,17 @@
 {
-  "editor.tabCompletion": "on"
+  "editor.tabCompletion": "on",
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "driver": "MySQL",
+      "name": "Azure MySQL",
+      "group": "Azure MySQL groupe",
+      "connectString": "mysql://adminUser123:AdminMic2025@micserver.mysql.database.azure.com:3306/micserver?sslaccept=strict"
+    }
+  ]
 }

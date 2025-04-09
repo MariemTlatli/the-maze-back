@@ -36,6 +36,7 @@ export class ChallengesService {
         isFrozen: toggleFreezeDto.isFrozen,
       },
     });
+    console.log('frozen', toggleFreezeDto.isFrozen);
     await this.refreshCache();
   }
 
