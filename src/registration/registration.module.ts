@@ -8,9 +8,9 @@ import { RegistrationService } from './registration.service';
   imports: [
     MailerModule.forRoot({
       transport: {
-        host: 'smtp.outlook.com',
-        secure: false,
-
+        host: 'smtp.gmail.com',
+        secure: true,
+        port: 465,
         auth: {
           user: process.env.MAILDEV_INCOMING_USER,
           pass: process.env.MAILDEV_INCOMING_PASS,

@@ -42,6 +42,8 @@ CREATE TABLE `Attendee` (
 CREATE TABLE `Ticket` (
     `ticketNo` VARCHAR(191) NOT NULL,
     `done` BOOLEAN NOT NULL DEFAULT false,
+    `hadMeal` BOOLEAN NOT NULL DEFAULT false,
+    `hadLunch` BOOLEAN NOT NULL DEFAULT false,
     `workshopId` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -87,7 +89,9 @@ CREATE TABLE `Challenge` (
     `number` INTEGER NOT NULL,
     `points` INTEGER NOT NULL,
     `description` MEDIUMTEXT NOT NULL,
-    `tech` ENUM('AI', 'WEB', 'DEVOPS', 'DEV', 'PROBLEM_SOLVING', 'UI_UX', 'OTHER') NULL,
+    `key` VARCHAR(191) NULL,
+    `hint` VARCHAR(191) NULL,
+    `tech` ENUM('AI', 'WEB', 'DEVOPS', 'MOBILE', 'PROBLEM_SOLVING', 'UI_UX', 'OTHER') NULL,
     `domaineId` INTEGER NULL,
 
     UNIQUE INDEX `Challenge_number_key`(`number`),
@@ -100,6 +104,14 @@ CREATE TABLE `Domaine` (
     `name` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Domaine_name_key`(`name`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Controle` (
+    `id` TINYINT NOT NULL AUTO_INCREMENT,
+    `isFrozen` BOOLEAN NOT NULL DEFAULT false,
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
