@@ -125,4 +125,41 @@ export class RegistrationController {
   updateRegistration(@Body() updateRegistration: UpdateRegistrationDto) {
     return this.registrationService.updateRegistration(updateRegistration);
   }
+
+  @Get('/statistics/general')
+  @ApiOkResponse({
+    description: 'Get all statistics',
+    type: GetRegistrationsResponse,
+  })
+  async getAllStats() {
+    const [
+      general,
+      workshops,
+      fac,
+      studyLevels,
+      specializations,
+      teamChallenges,
+    ] = await Promise.all([
+      this.registrationService.getGeneralStats(),
+      this.registrationService.getWorkshopStats(),
+      this.registrationService.getFacStats(),
+      this.registrationService.getStudyLevelStats(),
+      this.registrationService.getSpecializationStats(),
+      this.registrationService.getTeamChallengeStats(),
+    ]);
+
+    return {
+      general,
+      workshops,
+      fac,
+      studyLevels,
+      specializations,
+      teamChallenges,
+    };
+  }
+
+  @Post('/test/w')
+  async createWorkshop(@Body('name') name: string) {
+    return this.registrationService.createWorkshop(name);
+  }
 }

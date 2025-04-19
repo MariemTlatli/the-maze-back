@@ -30,7 +30,115 @@ export class RegistrationService {
     private mailerService: MailerService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
+  // *****************************************
 
+  async createWorkshop(name: string) {
+    return this.prismaService.workshop.create({
+      data: {
+        name: name,
+      },
+    });
+  }
+  async getGeneralStats() {
+    const [
+      totalAttendees,
+      presentAttendees,
+      attendeesHadLunch,
+      attendeesHadDinner,
+      totalTeams,
+    ] = await Promise.all([
+      this.prismaService.attendee.count(),
+      this.prismaService.attendee.count({
+        where: { ticket: { done: true } },
+      }),
+      this.prismaService.attendee.count({
+        where: { ticket: { hadLunch: true } },
+      }),
+      this.prismaService.attendee.count({
+        where: { ticket: { hadMeal: true } },
+      }),
+      this.prismaService.team.count(),
+    ]);
+
+    return {
+      totalAttendees,
+      presentAttendees,
+      attendeesHadLunch,
+      attendeesHadDinner,
+      totalTeams,
+    };
+  }
+
+  async getWorkshopStats() {
+    const workshops = await this.prismaService.workshop.findMany({
+      include: {
+        _count: {
+          select: {
+            tickets: {
+              where: { hasAttended: true },
+            },
+          },
+        },
+      },
+    });
+
+    return workshops.map((workshop) => ({
+      id: workshop.id,
+      name: workshop.name,
+      attendeesCount: workshop._count.tickets,
+    }));
+  }
+
+  async getFacStats() {
+    return this.prismaService.fac.findMany({
+      include: {
+        _count: {
+          select: { attendees: true },
+        },
+      },
+    });
+  }
+
+  async getStudyLevelStats() {
+    return this.prismaService.attendee.groupBy({
+      by: ['studyLevel'],
+      _count: {
+        id: true,
+      },
+      where: {
+        studyLevel: {
+          not: null,
+        },
+      },
+    });
+  }
+
+  async getSpecializationStats() {
+    return this.prismaService.attendee.groupBy({
+      by: ['specialization'],
+      _count: {
+        id: true,
+      },
+      where: {
+        specialization: {
+          not: null,
+        },
+      },
+    });
+  }
+
+  async getTeamChallengeStats() {
+    return this.prismaService.challengesByTeam.findMany({
+      include: {
+        team: true,
+        challenge: true,
+      },
+      orderBy: {
+        challengeId: 'asc',
+      },
+    });
+  }
+  // *************************
   async confirmDinner(dinnerCheckin: DinnerCheckin) {
     const { ticketNo } = dinnerCheckin;
     console.log(dinnerCheckin);
@@ -250,6 +358,11 @@ export class RegistrationService {
             },
             {
               email: {
+                contains: search,
+              },
+            },
+            {
+              ticketId: {
                 contains: search,
               },
             },
