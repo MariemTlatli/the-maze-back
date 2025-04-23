@@ -1,71 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to the Maze event!</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-      }
 
-      h3 {
-        font-family: 'Poppins', sans-serif;
-        text-align: center;
-        font-size: 1.5rem;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to the Maze event!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet" />
+  <style>
+    body {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
 
-      p,
-      li {
-        font-family: 'Poppins', sans-serif;
-        font-size: 1rem;
-        line-height: 1.7;
-      }
+    h3 {
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      font-size: 1.5rem;
+    }
 
-      .qrcode {
-        display: flex;
-        margin: 2rem auto;
-        justify-content: center;
-        align-items: center;
-      }
-    </style>
-  </head>
+    p,
+    li {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
 
-  <body>
-    <h3>Welcome to the Maze Event!</h3>
-    <p>
-      Hello <b>{{NAME}}</b>,<br />
-      We are thrilled to welcome you to the "A Maze" competition!
-      Congratulations on successfully registering for this exciting event.
-      Prepare yourself for an exhilarating journey through twists, turns, and
-      challenges that will test your skills and strategic thinking. Our maze is
-      designed to challenge even the most seasoned competitors, offering an
-      experience like no other.
-    </p>
-    <li>📅 Date: 9AM, 26 & 27 Avril , 2025.</li>
-    <li>📍 Location: Polytechnique Sousse</li>
-    <li>⏰ Duration: 24-hour event.</li>
-    <div class="qrcode">
-      <img
-        src="{{QR_CODE}}"
-        alt="QR Code"
-        style="width: 200px; height: 200px"
-      />
-    </div>
-    <p>
-      Best of luck, and may the odds be ever in your favor!
-      <br />
-      Warm regards,
-    </p>
-    <p><b>Microsoft ISSATSO</b></p>
-  </body>
+    .qrcode {
+      display: flex;
+      margin: 2rem auto;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+
+<body>
+  <h3>Welcome to the Maze Event!</h3>
+  <p>
+    Hello <b>{{NAME}}</b>,<br />
+    We are thrilled to welcome you to "THE MAZE 2.0" competition!
+    Congratulations on successfully registering for this exciting event.
+    Prepare yourself for an exhilarating journey through twists, turns, and
+    challenges that will test your skills and strategic thinking. Our maze is
+    designed to challenge even the most seasoned competitors, offering an
+    experience like no other.
+  </p>
+  <li>📅 Date: 9AM, 26 & 27 Avril , 2025.</li>
+  <li>📍 Location: Polytechnique Sousse</li>
+  <li>⏰ Duration: 24-hour event.</li>
+  <div class="qrcode">
+    <img src="{{QR_CODE}}" alt="QR Code" style="width: 200px; height: 200px" />
+  </div>
+  <p>
+    Best of luck, and may the odds be ever in your favor!
+    <br />
+    Warm regards,
+  </p>
+  <p><b>Microsoft ISSATSO</b></p>
+</body>
+
 </html>
