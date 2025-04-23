@@ -2,6 +2,8 @@ import { MailerService } from '@nestjs-modules/mailer';
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
   NotFoundException,
@@ -138,6 +140,42 @@ export class RegistrationService {
       },
     });
   }
+  async getAttendeesPresentAtWorkshop(workshopId: string) {
+    const workshop = await this.prismaService.workshop.findUnique({
+      where: { id: workshopId },
+    });
+
+    if (!workshop) {
+      throw new HttpException('Workshop not found', HttpStatus.NOT_FOUND);
+    }
+
+    return this.prismaService.workshop
+      .findUnique({
+        where: { id: workshopId },
+        select: {
+          tickets: {
+            where: { hasAttended: true },
+            select: {
+              ticket: {
+                select: {
+                  attendee: {
+                    select: {
+                      name: true,
+                      email: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+      .then((workshop) =>
+        workshop.tickets.flatMap(
+          (ticketRelation) => ticketRelation.ticket.attendee,
+        ),
+      );
+  }
   // *************************
   async confirmDinner(dinnerCheckin: DinnerCheckin) {
     const { ticketNo } = dinnerCheckin;
@@ -259,11 +297,18 @@ export class RegistrationService {
         select: {
           ticketNo: true,
           done: true,
+          hadMeal: true,
+          hadLunch: true,
           attendee: {
             select: {
               id: true,
               name: true,
               email: true,
+              facId: true,
+              studyLevel: true,
+              specialization: true,
+              teamId: true,
+              phone: true,
               team: {
                 select: {
                   id: true,
@@ -524,7 +569,7 @@ export class RegistrationService {
     try {
       await this.mailerService.sendMail({
         to: to,
-        from: 'themazeevent@outlook.com',
+        from: process.env.MAILDEV_INCOMING_USER,
         subject: 'Ticket for the maze event ✔',
         text: 'welcome participant',
         attachDataUrls: true, //to accept base64 content in messsage

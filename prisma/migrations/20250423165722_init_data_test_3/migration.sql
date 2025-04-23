@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Challenge` MODIFY `tech` ENUM('AI', 'WEB', 'DEVOPS', 'MOBILE', 'PROBLEM_SOLVING', 'UI_UX', 'SECURITY', 'OTHER') NULL;

@@ -162,4 +162,12 @@ export class RegistrationController {
   async createWorkshop(@Body('name') name: string) {
     return this.registrationService.createWorkshop(name);
   }
+
+  @Get(':id/attendees-present')
+  async getAttendeesPresent(@Param('id') workshopId: string) {
+    const attendees =
+      await this.registrationService.getAttendeesPresentAtWorkshop(workshopId);
+    return { attendees };
+  }
+  
 }

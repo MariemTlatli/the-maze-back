@@ -34,6 +34,7 @@ enum Tech {
   MOBILE
   PROBLEM_SOLVING
   UI_UX
+  SECURITY
   OTHER
 }
 
@@ -94,6 +95,7 @@ model Ticket {
 
 model WorkshopsByTicket {
   hasAttended Boolean @default(false)
+  hasCertification  Boolean @default(false) 
 
   ticketId String
   ticket   Ticket @relation(fields: [ticketId], references: [ticketNo], onDelete: Cascade)
@@ -156,3 +158,4 @@ model Controle {
    id Int     @id  @db.TinyInt @default(autoincrement())
   isFrozen  Boolean    @default(false)
 }
+
