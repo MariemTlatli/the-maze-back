@@ -1,5 +1,6 @@
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -32,6 +33,8 @@ import {
   GetTeamsResponse,
 } from './responses/get-registrations.response';
 import { RegistrationFormResponse } from './responses/registrationForm.response';
+import * as zlib from 'zlib';
+import * as util from 'util';
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('Registration')
@@ -162,6 +165,44 @@ export class RegistrationController {
   async createWorkshop(@Body('name') name: string) {
     return this.registrationService.createWorkshop(name);
   }
+  @Post('/test/e')
+  async sendCertificatesToEmails(
+    @Body('emails') emails: string[], // Liste des emails (remplacez "name" par "emails")
+    @Body('workshopId') workshopId: string, // ID de l'atelier
+    @Body('pdfBuffers') pdfBuffers: string[], // Tableau de buffers PDF encodés en base64
+  ) {
+    // Validation des entrées
+    if (!Array.isArray(emails) || emails.length === 0) {
+      throw new BadRequestException(
+        'The "emails" field must be a non-empty array.',
+      );
+    }
+
+    if (!workshopId) {
+      throw new BadRequestException('The "workshopId" field is required.');
+    }
+
+    if (!Array.isArray(pdfBuffers) || pdfBuffers.length !== emails.length) {
+      throw new BadRequestException(
+        'The "pdfBuffers" field must be an array of the same length as "emails".',
+      );
+    }
+    // Décompresser les PDF
+    const decompressedPdfs = await Promise.all(
+      pdfBuffers.map(async (base64CompressedPdf) => {
+        const compressedBuffer = Buffer.from(base64CompressedPdf, 'base64');
+        const decompressAsync = util.promisify(zlib.gunzip);
+        return decompressAsync(compressedBuffer); // Retourne un Buffer décompressé
+      }),
+    );
+
+    // Appel du service pour envoyer les certificats
+    return this.registrationService.sendCertificatesToEmails(
+      emails,
+      workshopId,
+      decompressedPdfs.map((buffer) => buffer.toString('base64')),
+    );
+  }
 
   @Get(':id/attendees-present')
   async getAttendeesPresent(@Param('id') workshopId: string) {
@@ -169,5 +210,4 @@ export class RegistrationController {
       await this.registrationService.getAttendeesPresentAtWorkshop(workshopId);
     return { attendees };
   }
-  
 }

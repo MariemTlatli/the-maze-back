@@ -1,3 +1,4 @@
+import { WorkshopByTicket } from './responses/get-registrations.response';
 import { MailerService } from '@nestjs-modules/mailer';
 import {
   BadRequestException,
@@ -141,6 +142,7 @@ export class RegistrationService {
     });
   }
   async getAttendeesPresentAtWorkshop(workshopId: string) {
+    // Vérifie si l'atelier existe
     const workshop = await this.prismaService.workshop.findUnique({
       where: { id: workshopId },
     });
@@ -166,15 +168,100 @@ export class RegistrationService {
                   },
                 },
               },
+              hasCertification: true,
             },
           },
         },
       })
       .then((workshop) =>
-        workshop.tickets.flatMap(
-          (ticketRelation) => ticketRelation.ticket.attendee,
-        ),
+        workshop.tickets.flatMap((ticketRelation) => ({
+          name: ticketRelation.ticket.attendee.name,
+          email: ticketRelation.ticket.attendee.email,
+          hasCertification: ticketRelation.hasCertification,
+        })),
       );
+  }
+
+  async sendEmailWithCertificate(to: string, name: string, pdf: string) {
+    //TODO ask team mic to give you template for email
+    const template = fs.readFileSync('public/certif.html', 'utf8');
+    // console.log(pdf);
+    let content = template.replace('{{QR_CODE}}', 'pdf');
+    content = content.replace('{{NAME}}', name);
+    console.log(content);
+    try {
+      // Convertir le PDF base64 en Buffer
+      const pdfBuffer = Buffer.from(pdf, 'base64');
+      await this.mailerService.sendMail({
+        to: to,
+        from: process.env.MAILDEV_INCOMING_USER,
+        subject: 'Ticket for the maze event ✔',
+        text: 'welcome participant',
+        attachDataUrls: true, //to accept base64 content in messsage
+        html: content,
+        attachments: [
+          {
+            filename: 'certificate.pdf', // Nom du fichier joint
+            content: pdfBuffer, // Contenu du fichier (PDF)
+            contentType: 'application/pdf', // Type MIME pour un fichier PDF
+          },
+        ],
+      });
+    } catch (error) {
+      console.log({ error });
+    }
+  }
+  async updateHasCertification(ticketId: string, workshopId: string) {
+    await this.prismaService.workshopsByTicket.updateMany({
+      where: {
+        ticketId,
+        workshopId,
+      },
+      data: {
+        hasCertification: true,
+      },
+    });
+  }
+
+  async sendCertificatesToEmails(
+    emails: string[],
+    workshopId: string,
+    pdfBuffer: string[],
+  ) {
+    // Étape 1 : Récupérer les participants via leurs emails
+    const participants = await this.prismaService.attendee.findMany({
+      where: {
+        email: { in: emails },
+      },
+      include: {
+        ticket: {
+          include: {
+            workshops: {
+              where: { workshopId },
+            },
+          },
+        },
+      },
+    });
+    for (let i = 0; i < participants.length; i++) {
+      const { name, email, ticket } = participants[i];
+
+      if (!ticket || !ticket.workshops || ticket.workshops.length === 0) {
+        console.warn(`No valid ticket or workshop found for ${email}`);
+        continue;
+      }
+      const { ticketNo: ticketId } = ticket;
+      try {
+        await this.sendEmailWithCertificate(email, name, pdfBuffer[i]);
+
+        // Étape 4 : Mettre à jour hasCertification
+        await this.updateHasCertification(ticketId, workshopId);
+
+        console.log(`Certification sent to ${name} (${email})`);
+      } catch (error) {
+        console.error(`Failed to send certification`, error);
+      }
+    }
   }
   // *************************
   async confirmDinner(dinnerCheckin: DinnerCheckin) {
@@ -343,7 +430,7 @@ export class RegistrationService {
     const QRimg = await this.generateQRImg(email, ticketNo);
 
     //send email
-    await this.sendEmail(email, QRimg, name);
+    await this.sendEmail(email, QRimg, name, ticketNo);
     await this.refreshCache();
 
     return `<img src="${QRimg}" alt="QR Code" />`;
@@ -559,12 +646,13 @@ export class RegistrationService {
     });
   }
 
-  async sendEmail(to: string, qr: string, name: string) {
+  async sendEmail(to: string, qr: string, name: string, ticketNo: string) {
     //TODO ask team mic to give you template for email
     const template = fs.readFileSync('public/template.html', 'utf8');
 
     let content = template.replace('{{QR_CODE}}', qr);
     content = content.replace('{{NAME}}', name);
+    content = content.replace('{{NUMERO_TICKET}}', ticketNo);
 
     try {
       await this.mailerService.sendMail({
@@ -646,7 +734,12 @@ export class RegistrationService {
 
     const QRimg = await this.generateQRImg(ticket.attendee.email, ticketNo);
 
-    await this.sendEmail(ticket.attendee.email, QRimg, ticket.attendee.name);
+    await this.sendEmail(
+      ticket.attendee.email,
+      QRimg,
+      ticket.attendee.name,
+      ticketNo,
+    );
     return `<img src="${QRimg}" alt="QR Code" />`;
   }
 
