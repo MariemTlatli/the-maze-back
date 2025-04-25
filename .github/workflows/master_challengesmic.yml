@@ -25,9 +25,9 @@ jobs:
           ssh -o StrictHostKeyChecking=no \
               -o UserKnownHostsFile=/dev/null \
               "$USER@$AZURE_IP" << 'EOF'
-                cd ~/checkin-the-maze-back
-                git fetch origin main
-                git reset --hard origin/main
+                cd ~/the-maze-back
+                git fetch origin master
+                git reset --hard origin/master
                 sudo docker compose down
                 sudo docker compose up -d --build
           EOF
