@@ -1,10 +1,12 @@
-version: '3'
+
 services:
   app:
     build: .
     restart: always
     environment:
       - NODE_ENV=production
+      - PORT=4000
+      - DATABASE_URL=mysql://root:AdminMic2025@db:3306/micserver
     ports:
       - '4000:4000'
     depends_on:
@@ -23,4 +25,4 @@ services:
     volumes:
       - ./data:/var/lib/mysql
     ports:
-      - '3306:3306'
+      - '3307:3306'

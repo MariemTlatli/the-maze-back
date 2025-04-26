@@ -5,7 +5,7 @@ COPY package.json .
 COPY package-lock.json .
 RUN npm install
 COPY . .
-COPY .env .env
+# Environment variables are set in docker-compose.yml
 RUN npx prisma generate
 RUN npm run build
 WORKDIR /app/dist
