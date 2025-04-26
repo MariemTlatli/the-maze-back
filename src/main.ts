@@ -9,7 +9,11 @@ import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  app.enableCors({
+    origin: ['https://micadmin.netlify.app'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true,
+  });
 
   initSecurityConfig(app);
 
@@ -19,7 +23,7 @@ async function bootstrap() {
 
   // Augmenter la limite de taille du corps de la requête
   app.use(express.json({ limit: '50mb' }));
-  app.use(express.urlencoded({ limit: '50mb', extended: true }));
+  app.use(express.urlencoded({ limit: '51mb', extended: true }));
 
   await app.listen(process.env.PORT);
 }
