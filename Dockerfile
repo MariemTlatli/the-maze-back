@@ -9,5 +9,5 @@ COPY .env .env
 RUN npx prisma generate
 RUN npm run build
 WORKDIR /app/dist
-EXPOSE 8080
+EXPOSE 4000
 CMD ["npm","run", "start"]
